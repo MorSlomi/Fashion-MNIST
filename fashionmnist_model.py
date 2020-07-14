@@ -27,24 +27,12 @@ def load_dataset():
 	# one hot encode target values
 	trainY = to_categorical(trainY)
 	testY = to_categorical(testY)
+  # convert from integers to floats
+	trainX = trainX.astype('float32')
+	testX = testX.astype('float32')
 	return trainX, trainY, testX, testY
 
-# Preparing Pixel Data
-def prep_pixels(trainX, testX):
-  # scale pixels
-  # convert from integers to floats
-  trainX = trainX.astype('float32')
-  testX = testX.astype('float32')
-  #Centering pixels
-  trainX -= np.mean(trainX, axis=0)
-  testX -= np.mean(testX, axis=0)
-  return trainX, testX
-
 # Implementing the model
-BS = 64
-EPOCHS = 10
-NUM_TOPICS = 10
-DROP_RATE = 0.25
 def build_model(trainX, trainY,batch_size,epochs, num_topics, drop_rate):
   model = Sequential()
 
@@ -85,7 +73,7 @@ def build_model(trainX, trainY,batch_size,epochs, num_topics, drop_rate):
   # Compile the model
   model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
   # Train the model
-  history = model.fit(trainX, trainY, epochs=EPOCHS, batch_size=BS, validation_data=(testX, testY),shuffle=True)
+  history = model.fit(trainX, trainY, epochs=EPOCHS, batch_size=BS, validation_data=(testX, testY), shuffle=True)
   score = model.evaluate(testX, testY, verbose=0)
   return score ,history
 
@@ -96,16 +84,29 @@ def curves(fashion_train):
   val_loss = fashion_train.history['val_loss']
   epochs = range(len(accuracy))
   # Plots
-  plt.plot(epochs, accuracy, 'bo', label='Training accuracy')
+  plt.plot(epochs, accuracy, 'mo', label='Training accuracy')
   plt.plot(epochs, val_accuracy, 'b', label='Validation accuracy')
   plt.title('Training and validation accuracy')
   plt.legend()
+  plt.savefig('/content/drive/My Drive/FashionAI/FashionMNISTCurvesAcc.jpg')
+
   plt.figure()
-  plt.plot(epochs, loss, 'bo', label='Training loss')
+  plt.plot(epochs, loss, 'mo', label='Training loss')
   plt.plot(epochs, val_loss, 'b', label='Validation loss')
   plt.title('Training and validation loss')
   plt.legend()
+  plt.savefig('/content/drive/My Drive/FashionAI/FashionMNISTCurvesLoss.jpg')
+
   plt.show()
+
+BS = 256
+EPOCHS = 20
+NUM_TOPICS = 10
+DROP_RATE = 0.5
+IMG_R, IMG_C = 28, 28
+CLASSES_LABELS = ['T-shirt/top', 'Trouser/pants', 'Pullover shirt', 'Dress', 'Coat', 'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
+PLT_NUM_ROWS= 10
+PLT_NUM_COLS = 3
 
 # loading the dataset
 trainX, trainY, testX, testY = load_dataset()
