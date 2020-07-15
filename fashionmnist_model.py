@@ -18,12 +18,12 @@ from keras.layers import Conv2D,Dense,MaxPooling2D,Dropout,Flatten, Activation, 
 import matplotlib.pyplot as plt
 
 # Loading Dataset
-def load_dataset():
+def load_dataset(img_r,img_c):
 	# load dataset
 	(trainX, trainY), (testX, testY) = fashion_mnist.load_data()
 	# reshape dataset to have a single channel
-	trainX = trainX.reshape((trainX.shape[0], 28, 28, 1))
-	testX = testX.reshape((testX.shape[0], 28, 28, 1))
+	trainX = trainX.reshape((trainX.shape[0], img_r,img_c, 1))
+	testX = testX.reshape((testX.shape[0], img_r,img_c, 1))
 	# one hot encode target values
 	trainY = to_categorical(trainY)
 	testY = to_categorical(testY)
@@ -105,13 +105,9 @@ NUM_TOPICS = 10
 DROP_RATE = 0.5
 IMG_R, IMG_C = 28, 28
 CLASSES_LABELS = ['T-shirt/top', 'Trouser/pants', 'Pullover shirt', 'Dress', 'Coat', 'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
-PLT_NUM_ROWS= 10
-PLT_NUM_COLS = 3
 
 # loading the dataset
-trainX, trainY, testX, testY = load_dataset()
-# preparing pixel data
-trainX, testX = prep_pixels(trainX, testX)
+trainX, trainY, testX, testY = load_dataset(IMG_R, IMG_C)
 # evaluating the model
 scores, histories = build_model(trainX, trainY, BS, EPOCHS, NUM_TOPICS, DROP_RATE)
 
