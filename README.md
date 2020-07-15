@@ -1,2 +1,3 @@
 # Fashion-MNIST
-Implementation of a convolutional neural network model to classify images of clothing, using the Fashion-MNIST dataset, built by Keras, Python.
+Implementation of two convolutional neural network models to classify images of clothing.
+One with data augmentation, using the Fashion-MNIST dataset, built by Keras, Python.
