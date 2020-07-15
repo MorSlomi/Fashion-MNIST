@@ -90,19 +90,18 @@ def build_model(trainX, trainY, num_topics, drop_rate):
   return model
 
 
-
 #  Image Data Augumentation & Training
 def fit_model(model, trainX, trainY, testX, testY, batch_size,epochs):
   gen = ImageDataGenerator(
           rescale=1./255,
-          rotation_range=20,
+          #rotation_range=20,
           shear_range=0.2,
-          zoom_range=0.2,
+          #zoom_range=0.2,
           horizontal_flip=True)
   test_gen = ImageDataGenerator(rescale=1./255)
 
-  batches = gen.flow(trainX, trainY, batch_size=batch_size)
-  test_batches = test_gen.flow(testX, testY, batch_size=batch_size)#, shuffle=False)
+  batches = gen.flow(trainX, trainY, batch_size=batch_size, shuffle=True)
+  test_batches = test_gen.flow(testX, testY, batch_size=batch_size, shuffle=False)
 
   # Train the model
   history = model.fit_generator(batches, steps_per_epoch=trainX.shape[0]//batch_size, epochs=epochs,validation_data=test_batches,
@@ -120,12 +119,16 @@ def curves(model, epochs):
   plt.plot(range(epochs), acc, 'mo', label='Training accuracy')
   plt.plot(range(epochs), val_acc, 'b', label='Validation accuracy')
   plt.title('Training and validation accuracy')
+  plt.savefig('/content/drive/My Drive/FashionAI/FashionMNIST_AUGCurvesAcc.jpg')
+
   plt.legend()
   plt.figure()
   plt.plot(range(epochs), loss, 'mo', label='Training loss')
   plt.plot(range(epochs), val_loss, 'b', label='Validation loss')
   plt.title('Training and validation loss')
   plt.legend()
+  plt.savefig('/content/drive/My Drive/FashionAI/FashionMNIST_AUGCurvesLoss.jpg')
+
   plt.show() 
 
 
@@ -142,8 +145,8 @@ def confusion_mat(model,Y_pred, testY_labels, class_labels):
   plt.xticks(rotation=40) 
   plt.ylabel('True label')
   plt.xlabel('Predicted label')
-  confusion_mat_plt = plt
-  return  confusion_mat_plt, classification_rep
+  plt.savefig('/content/drive/My Drive/FashionAI/FashionMNIST_AUG_confusion_matrix.jpg')
+  return  plt, classification_rep
 
 
 
@@ -162,7 +165,7 @@ def plot_img(i, predictions_array, true_label, img, class_labels):
   plt.xlabel("{} {:2.0f}% ({})".format(class_labels[predicted_label],
                                 100*np.max(predictions_array),
                                 class_labels[true_label]),
-  
+                                color=color,fontsize=10)
   
 
 #Plotting Number of Images with True Label & Predicted Label (using plot_image function)
@@ -172,14 +175,14 @@ def predicted_imgs(Y_pred, testY_labels, testX_img, class_labels, plt_num_rows, 
   for i in range(num_images):
     plt.subplot(plt_num_rows, 2*plt_num_cols, 2*i+1)
     plot_img(i, Y_pred[i], testY_labels, testX_img, class_labels)
+  plt.savefig('/content/drive/My Drive/FashionAI/FashionMNIST_AUG_predicted_imgs.jpg')
   plt.show()
-                              color=color,fontsize=10)
 
 # Setting the Parameters & Hyperparameters
 BS = 256
-EPOCHS = 25
+EPOCHS = 70
 NUM_TOPICS = 10
-DROP_RATE = 0.25
+DROP_RATE = 0.45
 IMG_R, IMG_C = 28, 28
 CLASSES_LABELS = ['T-shirt/top', 'Trouser/pants', 'Pullover shirt', 'Dress', 'Coat', 'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
 PLT_NUM_ROWS= 10
@@ -191,7 +194,7 @@ trainX, trainY, testX, testY,trainX_img, trainY_labels, testX_img, testY_labels 
 # preparing pixel data
 trainX, testX = prep_pixels(trainX, testX)
 
-#Building the model
+# Building the model
 model = build_model(trainX, trainY, NUM_TOPICS, DROP_RATE)
 
 # Training & evaluating the model
@@ -206,7 +209,7 @@ print('Accuracy:{} \nLoss:{}'.format(scores[1] ,scores[0]))
 Y_pred = model.predict_generator(test_batches,steps=testY.shape[0]//BS+1)
 
 #test_batches.reset()
-confusion_mat, classification_rep = confusion_mat(model,Y_pred, testY, testY_labels, BS, CLASSES_LABELS)
+confusion_mat, classification_rep = confusion_mat(model,Y_pred, testY_labels, CLASSES_LABELS)
 
 print(classification_rep)
 
